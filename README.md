@@ -3,6 +3,7 @@ Implementation of the System Moniitor application, similar to htop
 
 ## Notes
 *   Running on WSL
+*   System::UpTime is not output correctly. Check again
 
 ## Build
 *   `make -j8 build`

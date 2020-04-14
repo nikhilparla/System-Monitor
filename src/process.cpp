@@ -36,7 +36,7 @@ void Process::setCpuUtil(float cpuUtil)
 
 // TODO: Return the command that generated this process
 string Process::Command() { 
-    return command_; 
+    return LinuxParser::Command(this->Pid()); 
 }
 
 void Process::setUser(std::string user)

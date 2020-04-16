@@ -25,7 +25,16 @@ void Process::setPid(int pid)
 
 // TODO: Return this process's CPU utilization
 float Process::CpuUtilization() 
-{ 
+{
+    vector<long> proctimes;
+    LinuxParser::ActiveJiffies(this->Pid(), proctimes);
+    // utime + stime
+    long totaltime = proctimes[0] + proctimes[1];  
+    // seconds = uptime - (starttime / Hertz)
+    long seconds = Process::UpTime() - proctimes[4];
+    // cpu_usage = 100 * ((total_time / Hertz) / seconds)
+    cpuUtil_ = (totaltime/seconds);
+
     return cpuUtil_; 
 }
 
@@ -60,7 +69,10 @@ string Process::User()
 }
 
 // TODO: Return the age of this process (in seconds)
-long int Process::UpTime() { return 0; }
+long int Process::UpTime() 
+{ 
+    return(LinuxParser::UpTime()); 
+}
 
 // TODO: Overload the "less than" comparison operator for Process objects
 // REMOVE: [[maybe_unused]] once you define the function

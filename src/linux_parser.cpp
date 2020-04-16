@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream> // TODO: remove after done
 #include <assert.h>
+#include <unistd.h>
 
 #include "linux_parser.h"
 
@@ -98,11 +99,10 @@ float LinuxParser::MemoryUtilization()
   }
 }
 
-// TODO: Read and return the system uptime
 long LinuxParser::UpTime() 
 { 
-  string uptime = "1122";
-  string idle;
+  long uptime;
+  long idle;
   string line;
   std::ifstream stream(kProcDirectory + kUptimeFilename);
   if (stream.is_open()) {
@@ -110,18 +110,43 @@ long LinuxParser::UpTime()
     std::istringstream linestream(line);
     linestream >> uptime >> idle;
   }
-  // return (atol(uptime.c_str()) + atol(idle.c_str()) ); 
-  // return (1122); 
-  return (std::stol(uptime.c_str()) + std::stol(idle.c_str()));
+  return ((uptime + idle)/ sysconf(_SC_CLK_TCK));
+  // return (uptime + idle); // already in secnonds
  
 }
 
 // TODO: Read and return the number of jiffies for the system
 long LinuxParser::Jiffies() { return 0; }
 
-// TODO: Read and return the number of active jiffies for a PID
 // REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::ActiveJiffies(int pid[[maybe_unused]]) { return 0; }
+void LinuxParser::ActiveJiffies(int pid,vector<long>& proctimes) 
+{ 
+  string line;
+  string string1, string2, string3, string4, string5, string6, string7, string8,  \
+      string9, string10, string11, string12, string13, string18, string19, string20, string21;
+  long string14;
+  long string15;
+  long string16;
+  long string17;
+  long string22;
+  std::ifstream filestream(kProcDirectory + to_string(pid) + kStatFilename);
+  if (filestream.is_open()) {
+    std::getline(filestream, line);
+    std::istringstream linestream2(line);
+    while (linestream2 >> string1 >> string2 >> string3 >> string4 >> string5 >>
+           string6 >> string7 >> string8 >> string9 >> string10 >> string11 >>
+           string12 >> string13 >> string14 >> string15 >> string16 >>
+           string17 >> string18 >> string19 >> string20 >> string21 >>
+           string22) {
+             proctimes.push_back(string14/sysconf(_SC_CLK_TCK));
+             proctimes.push_back(string15/sysconf(_SC_CLK_TCK));
+             proctimes.push_back(string16/sysconf(_SC_CLK_TCK));
+             proctimes.push_back(string17/sysconf(_SC_CLK_TCK));
+             proctimes.push_back(string22/sysconf(_SC_CLK_TCK));
+       return;
+    }
+  }
+}
 
 // TODO: Read and return the number of active jiffies for the system
 long LinuxParser::ActiveJiffies() { return 0; }
@@ -209,7 +234,6 @@ int LinuxParser::RunningProcesses()
   } 
 }
 
-// TODO: Read and return the command associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
 string LinuxParser::Command(int pid) 
 { 
@@ -221,7 +245,6 @@ string LinuxParser::Command(int pid)
     }
 }
 
-// TODO: Read and return the memory used by a process
 // REMOVE: [[maybe_unused]] once you define the function
 string LinuxParser::Ram(int pid) 
 { 
@@ -249,7 +272,6 @@ string LinuxParser::Uid(int pid[[maybe_unused]])
   return string(); 
 }
 
-// TODO: Read and return the user associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
 string LinuxParser::User(int pid) 
 {
@@ -265,10 +287,8 @@ string LinuxParser::User(int pid)
       while (linestream >> key >> value) {
         if (key == "Uid") {
           uid = value;
-          // break;
         }
       }
-      // break;  // break outer while
     }
   }
 
@@ -292,6 +312,19 @@ string LinuxParser::User(int pid)
   }
 }
 
-// TODO: Read and return the uptime of a process
+# if 0
 // REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::UpTime(int pid[[maybe_unused]]) { return 0; }
+long LinuxParser::UpTime() {
+  string line;
+  long uptime;
+  long idletime;
+  std::ifstream filestream(kProcDirectory + kUptimeFilename);
+  if (filestream.is_open()) {
+    std::getline(filestream, line);
+    std::istringstream linestream2(line);
+    while (linestream2 >> uptime >> idletime) {
+      return (uptime);  // already in seconds
+    }
+  }
+}
+#endif
